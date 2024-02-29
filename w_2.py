@@ -3,16 +3,18 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui
 
+from ui_file2 import Ui_MainWindow
 
-class Window(QMainWindow):
+
+class Window(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        uic.loadUi('addEditCoffeeForm.ui', self)
+        self.setupUi(self)
         # Подключение кнопок к обработчикам
         self.pushButton.clicked.connect(self.update_result)
         self.pushButton_2.clicked.connect(self.save_results)
         self.pushButton_3.clicked.connect(self.save_results2)
-        self.con = sqlite3.connect("coffee")
+        self.con = sqlite3.connect("data/coffee")
         self.tableWidget.itemChanged.connect(self.item_changed)
         self.modified = {}
         self.titles = None

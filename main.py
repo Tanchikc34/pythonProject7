@@ -3,14 +3,16 @@ import sys
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem
+
+from ui_file import Ui_MainWindow
 from w_2 import Window
 
 
-class MyWidget(QMainWindow):
+class MyWidget(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi("main.ui", self)
-        self.con = sqlite3.connect("coffee")
+        self.setupUi(self)
+        self.con = sqlite3.connect("data/coffee")
         self.pushButton.clicked.connect(self.update_result)
         self.pushButton_2.clicked.connect(self.create_window)
         self.titles = None
