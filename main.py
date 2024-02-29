@@ -1,17 +1,17 @@
 import sys
 from random import randrange
-from PyQt5 import uic
 from PyQt5.QtGui import QPainter, QColor
 from PyQt5.QtWidgets import QApplication, QMainWindow
+from ui_file import Ui_MainWindow
 
 
-# Git и желтые окружности
-class Example(QMainWindow):
+# Git и случайные окружности
+class Example(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('UI.ui', self)
+        self.setupUi(self)
         self.setFixedSize(800, 600)
-        self.setWindowTitle('Git и желтые окружности')
+        self.setWindowTitle('Git и случайные окружности')
         self.do_paint = False
         self.pushButton.clicked.connect(self.paint)
 
@@ -28,7 +28,7 @@ class Example(QMainWindow):
         self.update()
 
     def draw_flag(self, qp):
-        qp.setBrush(QColor(255, 204, 0))
+        qp.setBrush(QColor(randrange(0, 255), randrange(0, 255), randrange(0, 255)))
         d = randrange(5, 150)
         qp.drawEllipse(randrange(50, 750), randrange(120, 510), d, d)
 
