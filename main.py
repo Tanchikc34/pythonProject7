@@ -1,40 +1,47 @@
+import sqlite3
 import sys
-from random import randrange
-from PyQt5.QtGui import QPainter, QColor
-from PyQt5.QtWidgets import QApplication, QMainWindow
-from ui_file import Ui_MainWindow
+from PyQt5 import uic
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem
+from w_2 import Window
 
 
-# Git и случайные окружности
-class Example(QMainWindow, Ui_MainWindow):
+class MyWidget(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setupUi(self)
-        self.setFixedSize(800, 600)
-        self.setWindowTitle('Git и случайные окружности')
-        self.do_paint = False
-        self.pushButton.clicked.connect(self.paint)
+        uic.loadUi("main.ui", self)
+        self.con = sqlite3.connect("coffee")
+        self.pushButton.clicked.connect(self.update_result)
+        self.pushButton_2.clicked.connect(self.create_window)
+        self.titles = None
 
-    def paintEvent(self, event):
-        if self.do_paint:
-            qp = QPainter()
-            qp.begin(self)
-            self.draw_flag(qp)
-            qp.end()
-        self.do_paint = False
+    def create_window(self):
+        self.hide()
+        self.window = Window(self)
+        self.window.show()
 
-    def paint(self):
-        self.do_paint = True
-        self.update()
-
-    def draw_flag(self, qp):
-        qp.setBrush(QColor(randrange(0, 255), randrange(0, 255), randrange(0, 255)))
-        d = randrange(5, 150)
-        qp.drawEllipse(randrange(50, 750), randrange(120, 510), d, d)
+    def update_result(self):
+        cur = self.con.cursor()
+        # Получили результат запроса, который ввели в текстовое поле
+        result = cur.execute("SELECT * FROM coffee").fetchall()
+        # Заполнили размеры таблицы
+        self.tableWidget.setRowCount(len(result))
+        self.tableWidget.setColumnCount(7)
+        self.tableWidget.setHorizontalHeaderLabels(["ID", "название сорта", "степень обжарки", "молотый/в зернах", "описание вкуса", "цена", "объем упаковки"])
+        # Если запись не нашлась, то не будем ничего делать
+        if not result:
+            self.statusBar().showMessage('Ничего не нашлось')
+            return
+        self.tableWidget.setColumnCount(len(result[0]))
+        self.titles = [description[0] for description in cur.description]
+        # Заполнили таблицу полученными элементами
+        for i, elem in enumerate(result):
+            for j, val in enumerate(elem):
+                self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = Example()
+    ex = MyWidget()
     ex.show()
     sys.exit(app.exec())
